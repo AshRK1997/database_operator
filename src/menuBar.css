@@ -1,0 +1,28 @@
+.Menu_Styling {
+    background-color: rgba(95, 50, 82, 1);
+    color: #fff;
+    /* border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px; */
+}
+
+.Menu_Styling > .ui.secondary.pointing.menu .active.item:hover {
+    border-color: rgb(221, 220, 220);
+}
+
+.Menu_Styling > .ui.secondary.pointing.menu .active.item {
+    border-color: #fff;
+}
+
+.MuiInputBase-colorPrimary{
+    background-color: #fff;
+}
+
+/* .MuiAutocomplete-root > .MuiFormControl-root > .MuiInputBase-root{
+    height: 30px;
+}
+
+#grouped-demo {
+    height: 30px;
+    font-size: 15px;
+    margin: auto;
+} */
