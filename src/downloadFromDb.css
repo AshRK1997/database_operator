@@ -5,3 +5,13 @@
     align-items: center;
     padding: 2%;
 }
+
+
+.toast{
+    font-size: 60%;
+}
+
+#preview_grid {
+    padding-bottom: 3%;
+    z-index: 10;
+}
