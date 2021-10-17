@@ -7,8 +7,10 @@ The current functionality is to just download the file from database through que
 
 If you want fork this or clone this, please feel free to. Procedure is simple.
 
-Clone both the projects (this project and the backend project-https://github.com/AshRK1997/database-operator-backend)
-Run npm install in both the projects
-Run npm start in both  projects, change the env of this frontend project to the backend's Local address
+1. Clone both the projects (this project and the backend project-https://github.com/AshRK1997/database-operator-backend)
+
+2. Run npm install in both the projects
+
+3. Run npm start in both  projects, change the env of this frontend project to the backend's Local address
 
 
