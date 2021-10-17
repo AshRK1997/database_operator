@@ -11,8 +11,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
-import ReactDataGrid from '@inovua/reactdatagrid-enterprise';
-import '@inovua/reactdatagrid-enterprise/index.css';
+import ReactDataGrid from '@inovua/reactdatagrid-community';
+import '@inovua/reactdatagrid-community/index.css';
 import { Typography } from '@mui/material';
 
 
@@ -64,13 +64,14 @@ const getColumnsFromJson=(csv)=> {
       tempObj.name = keys[i];
       tempObj.defaultVisible=true;
       tempObj.sortable=true;
+      tempObj.defaultWidth = 200;
       
       
 
 
       columnsList.push({...tempObj})
     }
-
+    console.log(columnsList)
     return columnsList;
   } else {
     return [];
@@ -98,7 +99,7 @@ const filterValue=(csv)=> {
 
       columnsList.push({...tempObj})
     }
-
+    console.log("filterValues", columnsList);
     return columnsList;
   } else {
     return [];
@@ -150,7 +151,7 @@ function DownloadDb(props) {
       const handleDownloadCSV = () => {
         console.log("handleDownloadCSV clicked")
         
-        if (!(dbvalue || '').trim() || !(sqlQuery || '').trim().toLowerCase().includes('select')){
+        if (!(dbvalue || '').trim() || !(sqlQuery || '').trim().toLowerCase().includes('select') || !(sqlQuery || '').trim().toLowerCase().includes('from')){
           console.log("handleDownloadCSV inside if")
           toast.error('Please enter both the db connection url and the query or your query is wrong', {
             position: "bottom-left",
@@ -168,7 +169,9 @@ function DownloadDb(props) {
           if (result.data.success) {
             // const json2csvParser = new Json2csvParser({ header: true });
             // json2csvParser.parse()
-            setCsv(result.data.data)
+            console.log(result.data.data);
+
+            setCsv(result?.data?.data || [])
             setCsvLoaded(true)
           } else {
             toast.error('Could not retreive data due to this error: '+result.data.error, {
@@ -182,6 +185,7 @@ function DownloadDb(props) {
               });
               setCsvLoaded(false)
           }
+          console.log("data received setting loading to false")
           setLoading(false);
         }).catch((error)=> {
           toast.error('Could not retreive data due to this error: '+error, {
@@ -258,9 +262,6 @@ function DownloadDb(props) {
   columns={getColumnsFromJson(csv)}
   dataSource={csv}
   style={gridStyle}
-  pagination
-  defaultGroupBy={[]}
-  defaultLimit={50}
   defaultFilterValue={filterValue(csv)}
 /></Stack>
 </div>: <React.Fragment></React.Fragment>}
