@@ -3,6 +3,7 @@ import { Menu } from 'semantic-ui-react';
 import './menuBar.css';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import Link from '@mui/material/Link';
 
 // import CssBaseline from "@mui/material/CssBaseline";
 // import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -54,6 +55,11 @@ function MenuBar(props) {
           onClick={handleItemClick}
         /> */}
         <Menu.Menu position='right'>
+          <Menu.Item
+            style={{ fontSize: '120%', color: 'white' }}
+          >
+            <Link href='https://github.com/AshRK1997/database_operator' target='_blank' underline="none" style={{ color: 'white' }}>Github Repo</Link>
+          </Menu.Item>
           <Menu.Item>
             
             <Autocomplete
