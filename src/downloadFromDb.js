@@ -14,7 +14,7 @@ import axios from 'axios';
 import ReactDataGrid from '@inovua/reactdatagrid-community';
 import '@inovua/reactdatagrid-community/index.css';
 import { Typography } from '@mui/material';
-
+import AutoSuggest from './components/autosuggest_data'
 
 require('dotenv').config();
 
@@ -119,6 +119,7 @@ function DownloadDb(props) {
     const [csvLoaded, setCsvLoaded] = useState(false);
     const [gridRef, setGridRef] = useState(null);
     const [fileName, setFileName] = useState('');
+    const [previewHit, setPreviewHit] = useState(0);
 
     const exportCSV = () => {
       const columns = gridRef.current.visibleColumns;
@@ -137,19 +138,21 @@ function DownloadDb(props) {
       console.log("useEffect", csv)
     }, [csv])
 
-    const handleChangeDbString = (event) => {
-        setdbValue(event.target.value);
-      };
+    // const handleChangeDbString = (event) => {
+    //     setdbValue(event.target.value);
+    //   };
   
-      const handleChangeSqlQuery = (event) => {
-        setsqlQuery(event.target.value);
-      };
+    //   const handleChangeSqlQuery = (event) => {
+    //     setsqlQuery(event.target.value);
+    //   };
 
       const handleChangeFileQuery = (event) => {
         setFileName(event.target.value);
       };
 
       const handleDownloadCSV = () => {
+        let temp = previewHit
+        setPreviewHit(temp+1)
         console.log("handleDownloadCSV clicked")
         
         if (!(dbvalue || '').trim() || !(sqlQuery || '').trim().toLowerCase().includes('select') || !(sqlQuery || '').trim().toLowerCase().includes('from')){
@@ -217,28 +220,35 @@ function DownloadDb(props) {
         <CircularProgress color="inherit" />&nbsp;&nbsp;&nbsp;&nbsp;Loading...
       </Backdrop>   :
       <Stack spacing={2} direction="column">
-      <TextField
+      <AutoSuggest
           id="dbConfig-textarea"
           label="Db connection String"
           placeholder="postgres://YourUserName:YourPassword@localhost:5432/YourDatabase"
           multiline
           value={dbvalue}
-          onChange={handleChangeDbString}
+          onChange={setdbValue}
           maxRows={3}
           style={{width: "100%"}}
+          localStorageKey="db_config_string"
+          db_name={props?.db?.title}
+          previewHit={previewHit}
         />
 
-        <TextField
+        <AutoSuggest
           id="sql-textarea"
           label="SQL Query"
           placeholder="Please Enter the Query you want to run on the Database"
           multiline
           
           value={sqlQuery}
-          onChange={handleChangeSqlQuery}
+          onChange={setsqlQuery}
           maxRows={3}
           style={{width: "100%"}}
+          localStorageKey="query_config_string"
+          db_name={props?.db?.title}
+          previewHit={previewHit}
         />
+
         <TextField
           id="file-text"
           label="File Name"
