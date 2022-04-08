@@ -41,13 +41,13 @@ const downloadBlob = (blob, fileName = 'db-data.csv') => {
   document.body.removeChild(link);
 };
 
-const SEPARATOR = ',';
+const SEPARATOR = '^';
 
 
 const getQueryData=(connString, query)=> {
   
     console.log("getQueryData", process.env.REACT_APP_BACKEND_URL, connString, query)
-    return axios.post(`${process.env.REACT_APP_BACKEND_URL}/get/db/data`, { connString, query });
+    return axios.post(`${process.env.REACT_APP_BACKEND_URL}get/db/data`, { connString, query });
   
 }
 
@@ -130,6 +130,7 @@ function DownloadDb(props) {
       const blob = new Blob([contents], { type: 'text/csv;charset=utf-8;' });
   
       downloadBlob(blob, ((fileName || 'db-data') + ".csv"));
+      alert("Please make sure to change your seperator to '^' only while opening the csv file")
     };
 
     useEffect(() => {
