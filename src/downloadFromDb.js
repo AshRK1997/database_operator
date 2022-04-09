@@ -16,6 +16,9 @@ import '@inovua/reactdatagrid-community/index.css';
 import { Typography } from '@mui/material';
 import AutoSuggest from './components/autosuggest_data'
 
+import {Switch, FormControlLabel, Tooltip} from '@mui/material';
+import { TrafficOutlined } from '@mui/icons-material';
+
 require('dotenv').config();
 
 // const Json2csvParser = require("json2csv").Parser;
@@ -47,7 +50,7 @@ const SEPARATOR = '^';
 const getQueryData=(connString, query)=> {
   
     console.log("getQueryData", process.env.REACT_APP_BACKEND_URL, connString, query)
-    return axios.post(`${process.env.REACT_APP_BACKEND_URL}get/db/data`, { connString, query });
+    return axios.post(`${process.env.REACT_APP_BACKEND_URL}/get/db/data`, { connString, query });
   
 }
 
@@ -112,14 +115,24 @@ const filterValue=(csv)=> {
 }
 
 function DownloadDb(props) {
-    const [dbvalue, setdbValue] = useState('db');
-    const [sqlQuery, setsqlQuery] = useState('sql');
+    const [dbvalue, setdbValue] = useState('');
+    const [sqlQuery, setsqlQuery] = useState('');
     const [isLoading, setLoading] = useState(false);
     const [csv, setCsv] = useState('');
     const [csvLoaded, setCsvLoaded] = useState(false);
     const [gridRef, setGridRef] = useState(null);
     const [fileName, setFileName] = useState('');
     const [previewHit, setPreviewHit] = useState(0);
+    let tempState = localStorage.getItem("switchState");
+    // console.log("tempState", tempState, tempState === null)
+    
+    if (tempState === null || tempState === undefined) {
+      tempState = true
+    } else {
+      tempState = (tempState === 'true')
+    }
+
+    const [saveSuggestion, setSaveSuggestion] = useState(tempState);
   
     const exportCSV = () => {
       const columns = gridRef.current.visibleColumns;
@@ -139,6 +152,11 @@ function DownloadDb(props) {
       console.log("useEffect", dbvalue, sqlQuery)
     }, [dbvalue, sqlQuery])
 
+    useEffect(() => {
+      
+      localStorage.setItem("switchState", JSON.stringify(saveSuggestion));
+    }, [saveSuggestion])
+
     // const handleChangeDbString = (event) => {
     //     setdbValue(event.target.value);
     //   };
@@ -146,6 +164,10 @@ function DownloadDb(props) {
       const handleChangeSqlQuery = (event) => {
         console.log("downloadFromDb handleChangeSqlQuery", event)
         setsqlQuery(event);
+      };
+
+      const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSaveSuggestion(event.target.checked);
       };
 
       const handleChangeFileQuery = (event) => {
@@ -234,6 +256,7 @@ function DownloadDb(props) {
           localStorageKey="db_config_string"
           db_name={props?.db?.title}
           previewHit={previewHit}
+          saveSuggestion={saveSuggestion}
         />
 
         <AutoSuggest
@@ -249,6 +272,7 @@ function DownloadDb(props) {
           localStorageKey="query_config_string"
           db_name={props?.db?.title}
           previewHit={previewHit}
+          saveSuggestion={saveSuggestion}
         />
 
         <TextField
@@ -263,6 +287,19 @@ function DownloadDb(props) {
           style={{width: "100%"}}
         />
       <Stack spacing={2} direction="row">
+      <Tooltip title="If 'ON' your database credentials and queries will be saved locally, if 'OFF' nothing will be saved and any data stored will be cleared ">
+    <FormControlLabel
+          control={
+            <Switch
+      checked={saveSuggestion}
+      onChange={handleSwitchChange}
+      
+      inputProps={{ 'aria-label': 'controlled' }}
+    />
+          }
+          label="Save Suggestions"
+    />
+    </Tooltip>
       <Button variant="contained" onClick={handleDownloadCSV}>Preview</Button>
       {csvLoaded? <Button variant="contained" onClick={exportCSV}>Export To CSV</Button>: <React.Fragment></React.Fragment>}
     </Stack>

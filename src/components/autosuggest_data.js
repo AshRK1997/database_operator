@@ -34,7 +34,7 @@ export default function AutoSuggest(props) {
             temp_list_of_sugg = []
         }
 
-        if(props.value && !containsObject({"db_name": props?.db_name, "value": props.value}, temp_list_of_sugg)) {
+        if(props.saveSuggestion && props.value && !containsObject({"db_name": props?.db_name, "value": props.value}, temp_list_of_sugg)) {
             temp_list_of_sugg.push({"db_name": props?.db_name, "value": props.value})
             localStorage.setItem(props.localStorageKey, JSON.stringify(temp_list_of_sugg));
             list_of_suggestions.push({"db_name": props?.db_name, "value": props.value})
@@ -42,6 +42,17 @@ export default function AutoSuggest(props) {
     }
 
   }, [props?.previewHit, props.localStorageKey, props?.db_name])
+
+  React.useEffect(() => {
+    
+    if (!props.saveSuggestion){
+        
+        localStorage.removeItem(props.localStorageKey)
+    }
+
+  }, [props.saveSuggestion])
+
+
 
   return (
     
