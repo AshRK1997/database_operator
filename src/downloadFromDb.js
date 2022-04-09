@@ -14,7 +14,10 @@ import axios from 'axios';
 import ReactDataGrid from '@inovua/reactdatagrid-community';
 import '@inovua/reactdatagrid-community/index.css';
 import { Typography } from '@mui/material';
+import AutoSuggest from './components/autosuggest_data'
 
+import {Switch, FormControlLabel, Tooltip} from '@mui/material';
+import { TrafficOutlined } from '@mui/icons-material';
 
 require('dotenv').config();
 
@@ -47,7 +50,7 @@ const SEPARATOR = '^';
 const getQueryData=(connString, query)=> {
   
     console.log("getQueryData", process.env.REACT_APP_BACKEND_URL, connString, query)
-    return axios.post(`${process.env.REACT_APP_BACKEND_URL}get/db/data`, { connString, query });
+    return axios.post(`${process.env.REACT_APP_BACKEND_URL}/get/db/data`, { connString, query });
   
 }
 
@@ -119,7 +122,18 @@ function DownloadDb(props) {
     const [csvLoaded, setCsvLoaded] = useState(false);
     const [gridRef, setGridRef] = useState(null);
     const [fileName, setFileName] = useState('');
+    const [previewHit, setPreviewHit] = useState(0);
+    let tempState = localStorage.getItem("switchState");
+    // console.log("tempState", tempState, tempState === null)
+    
+    if (tempState === null || tempState === undefined) {
+      tempState = true
+    } else {
+      tempState = (tempState === 'true')
+    }
 
+    const [saveSuggestion, setSaveSuggestion] = useState(tempState);
+  
     const exportCSV = () => {
       const columns = gridRef.current.visibleColumns;
   
@@ -134,15 +148,26 @@ function DownloadDb(props) {
     };
 
     useEffect(() => {
-      console.log("useEffect", csv)
-    }, [csv])
+      
+      console.log("useEffect", dbvalue, sqlQuery)
+    }, [dbvalue, sqlQuery])
 
-    const handleChangeDbString = (event) => {
-        setdbValue(event.target.value);
-      };
+    useEffect(() => {
+      
+      localStorage.setItem("switchState", JSON.stringify(saveSuggestion));
+    }, [saveSuggestion])
+
+    // const handleChangeDbString = (event) => {
+    //     setdbValue(event.target.value);
+    //   };
   
       const handleChangeSqlQuery = (event) => {
-        setsqlQuery(event.target.value);
+        console.log("downloadFromDb handleChangeSqlQuery", event)
+        setsqlQuery(event);
+      };
+
+      const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSaveSuggestion(event.target.checked);
       };
 
       const handleChangeFileQuery = (event) => {
@@ -150,6 +175,8 @@ function DownloadDb(props) {
       };
 
       const handleDownloadCSV = () => {
+        let temp = previewHit
+        setPreviewHit(temp+1)
         console.log("handleDownloadCSV clicked")
         
         if (!(dbvalue || '').trim() || !(sqlQuery || '').trim().toLowerCase().includes('select') || !(sqlQuery || '').trim().toLowerCase().includes('from')){
@@ -217,18 +244,22 @@ function DownloadDb(props) {
         <CircularProgress color="inherit" />&nbsp;&nbsp;&nbsp;&nbsp;Loading...
       </Backdrop>   :
       <Stack spacing={2} direction="column">
-      <TextField
+      <AutoSuggest
           id="dbConfig-textarea"
           label="Db connection String"
           placeholder="postgres://YourUserName:YourPassword@localhost:5432/YourDatabase"
           multiline
           value={dbvalue}
-          onChange={handleChangeDbString}
+          onChange={setdbValue}
           maxRows={3}
           style={{width: "100%"}}
+          localStorageKey="db_config_string"
+          db_name={props?.db?.title}
+          previewHit={previewHit}
+          saveSuggestion={saveSuggestion}
         />
 
-        <TextField
+        <AutoSuggest
           id="sql-textarea"
           label="SQL Query"
           placeholder="Please Enter the Query you want to run on the Database"
@@ -238,7 +269,12 @@ function DownloadDb(props) {
           onChange={handleChangeSqlQuery}
           maxRows={3}
           style={{width: "100%"}}
+          localStorageKey="query_config_string"
+          db_name={props?.db?.title}
+          previewHit={previewHit}
+          saveSuggestion={saveSuggestion}
         />
+
         <TextField
           id="file-text"
           label="File Name"
@@ -251,6 +287,19 @@ function DownloadDb(props) {
           style={{width: "100%"}}
         />
       <Stack spacing={2} direction="row">
+      <Tooltip title="If 'ON' your database credentials and queries will be saved locally, if 'OFF' nothing will be saved and any data stored will be cleared ">
+    <FormControlLabel
+          control={
+            <Switch
+      checked={saveSuggestion}
+      onChange={handleSwitchChange}
+      
+      inputProps={{ 'aria-label': 'controlled' }}
+    />
+          }
+          label="Save Suggestions"
+    />
+    </Tooltip>
       <Button variant="contained" onClick={handleDownloadCSV}>Preview</Button>
       {csvLoaded? <Button variant="contained" onClick={exportCSV}>Export To CSV</Button>: <React.Fragment></React.Fragment>}
     </Stack>
