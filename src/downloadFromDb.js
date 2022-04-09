@@ -112,15 +112,15 @@ const filterValue=(csv)=> {
 }
 
 function DownloadDb(props) {
-    const [dbvalue, setdbValue] = useState('');
-    const [sqlQuery, setsqlQuery] = useState('');
+    const [dbvalue, setdbValue] = useState('db');
+    const [sqlQuery, setsqlQuery] = useState('sql');
     const [isLoading, setLoading] = useState(false);
     const [csv, setCsv] = useState('');
     const [csvLoaded, setCsvLoaded] = useState(false);
     const [gridRef, setGridRef] = useState(null);
     const [fileName, setFileName] = useState('');
     const [previewHit, setPreviewHit] = useState(0);
-
+  
     const exportCSV = () => {
       const columns = gridRef.current.visibleColumns;
   
@@ -135,16 +135,18 @@ function DownloadDb(props) {
     };
 
     useEffect(() => {
-      console.log("useEffect", csv)
-    }, [csv])
+      
+      console.log("useEffect", dbvalue, sqlQuery)
+    }, [dbvalue, sqlQuery])
 
     // const handleChangeDbString = (event) => {
     //     setdbValue(event.target.value);
     //   };
   
-    //   const handleChangeSqlQuery = (event) => {
-    //     setsqlQuery(event.target.value);
-    //   };
+      const handleChangeSqlQuery = (event) => {
+        console.log("downloadFromDb handleChangeSqlQuery", event)
+        setsqlQuery(event);
+      };
 
       const handleChangeFileQuery = (event) => {
         setFileName(event.target.value);
@@ -241,7 +243,7 @@ function DownloadDb(props) {
           multiline
           
           value={sqlQuery}
-          onChange={setsqlQuery}
+          onChange={handleChangeSqlQuery}
           maxRows={3}
           style={{width: "100%"}}
           localStorageKey="query_config_string"
